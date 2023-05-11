@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -49,6 +50,7 @@ func (jwtSrv *jwtService) GenerateToken(username string, admin bool) string {
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
+	log.Println(claims)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte(jwtSrv.secretKey))
 	if err != nil {
@@ -60,7 +62,7 @@ func (jwtSrv *jwtService) GenerateToken(username string, admin bool) string {
 func (jwtSrv *jwtService) ValidateToken(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(jwtSrv.secretKey), nil
 	})

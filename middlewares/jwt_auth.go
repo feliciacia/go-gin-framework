@@ -26,7 +26,9 @@ func AuthorizeJWT() gin.HandlerFunc {
 			log.Println("Claims[ExpiresAt]: ", claims["exp"])
 		} else {
 			log.Println(err)
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": err.Error(),
+			})
 		}
 	}
 }
