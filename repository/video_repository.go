@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/feliciacia/go-gin-framework/go-gin-framework/entity"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -18,21 +19,22 @@ type database struct {
 }
 
 func NewVideoRepository() VideoRepository {
-	db, err := gorm.Open("sqlite3", "test.db")
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect database")
 	}
-	db.AutoMigrate(&entity.Video, &entity.Person)
+	db.AutoMigrate(&entity.Video{}, &entity.Person{})
 	return &database{
 		connection: db,
 	}
 }
 
 func (db *database) CloseDB() {
-	err := db.connection.Close()
+	sqlDb, err := db.connection.DB()
 	if err != nil {
 		panic("Failed to close database")
 	}
+	sqlDb.Close()
 }
 
 func (db *database) Save(video entity.Video) {
@@ -49,6 +51,6 @@ func (db *database) Delete(video entity.Video) {
 
 func (db *database) FindAll() []entity.Video {
 	var videos []entity.Video
-	db.connection.Find(&videos)
+	db.connection.Set("gorm:auto_preload", true).Find(&videos)
 	return videos
 }
