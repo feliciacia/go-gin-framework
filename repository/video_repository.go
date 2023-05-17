@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/feliciacia/go-gin-framework/go-gin-framework/entity"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,8 @@ type database struct {
 }
 
 func NewVideoRepository() VideoRepository {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	dsn := "host = <HOSTNAME> user = <USERNAME> port = <8080> "
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect database")
 	}
